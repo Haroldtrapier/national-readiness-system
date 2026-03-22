@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from app.models.vendors import Vendor, VendorSupplyCapability, VendorMatch, Organization
+from app.models.vendors import Vendor, VendorSupplyCapability, VendorMatch
+from app.models.organizations import Organization
 from app.models.supplies import SupplyItem
 from app.models.geography import State, FemaRegion
 from app.utils.scoring import vendor_fit_score
