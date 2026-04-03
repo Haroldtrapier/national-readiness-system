@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Shield, AlertTriangle, MapPin } from 'lucide-react';
+import { Shield, AlertTriangle, MapPin, Lock } from 'lucide-react';
 import MetricCard from '../components/cards/MetricCard';
 import ReadinessBadge from '../components/ReadinessBadge';
 import DataTable from '../components/tables/DataTable';
 import PocCard from '../components/cards/PocCard';
+import SubscriptionBanner from '../components/SubscriptionBanner';
 import { useApi } from '../hooks/useApi';
+import { useSubscription } from '../hooks/useSubscription';
 import { api } from '../services/api';
 
 export default function RegionOperationsPage() {
   const [searchParams] = useSearchParams();
   const initialRegion = parseInt(searchParams.get('region') || '4');
   const [selectedRegion, setSelectedRegion] = useState(initialRegion);
+  const { subscribed } = useSubscription();
 
   const { data: regionData, loading } = useApi(
     () => api.hazards.getRegionHazards(selectedRegion),
@@ -53,6 +56,8 @@ export default function RegionOperationsPage() {
           </select>
         </div>
       </div>
+
+      {!subscribed && <SubscriptionBanner />}
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -118,7 +123,7 @@ export default function RegionOperationsPage() {
               {(pocs || []).length === 0 ? (
                 <p className="text-sm text-gray-500">No contacts loaded for this region</p>
               ) : (
-                (pocs || []).map((poc: any) => <PocCard key={poc.id} poc={poc} />)
+                (pocs || []).map((poc: any) => <PocCard key={poc.id} poc={poc} subscribed={subscribed} />)
               )}
 
               {brief?.recommended_actions && brief.recommended_actions.length > 0 && (
@@ -142,7 +147,13 @@ export default function RegionOperationsPage() {
               <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Regional Vendors</h3>
               <DataTable
                 columns={[
-                  { key: 'organization_name', label: 'Vendor' },
+                  {
+                    key: 'organization_name',
+                    label: 'Supplier',
+                    render: (row: any) => subscribed
+                      ? <span>{row.organization_name}</span>
+                      : <span className="inline-flex items-center gap-1 text-orange-400/70 text-xs font-medium bg-orange-500/10 border border-orange-500/20 rounded px-1.5 py-0.5"><Lock size={10} />Subscribe to View</span>,
+                  },
                   { key: 'vendor_type', label: 'Type' },
                   { key: 'geographic_coverage', label: 'Coverage' },
                   {

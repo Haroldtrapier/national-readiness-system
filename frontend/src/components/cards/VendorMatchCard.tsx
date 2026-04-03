@@ -1,11 +1,12 @@
-import { Check, X, Clock, Truck } from 'lucide-react';
+import { Check, X, Clock, Truck, Lock } from 'lucide-react';
 import type { VendorMatch } from '../../types';
 
 interface VendorMatchCardProps {
   vendor: VendorMatch;
+  subscribed?: boolean;
 }
 
-export default function VendorMatchCard({ vendor }: VendorMatchCardProps) {
+export default function VendorMatchCard({ vendor, subscribed = false }: VendorMatchCardProps) {
   const fitColor =
     vendor.fit_score >= 0.8 ? 'text-green-400' :
     vendor.fit_score >= 0.6 ? 'text-yellow-400' :
@@ -15,7 +16,15 @@ export default function VendorMatchCard({ vendor }: VendorMatchCardProps) {
     <div className="p-3 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-gray-600/50 transition-colors">
       <div className="flex items-start justify-between">
         <div>
-          <span className="text-sm font-medium">{vendor.vendor_name}</span>
+          {subscribed
+            ? <span className="text-sm font-medium">{vendor.vendor_name}</span>
+            : (
+              <span className="inline-flex items-center gap-1 text-orange-400/70 text-xs font-medium bg-orange-500/10 border border-orange-500/20 rounded px-1.5 py-0.5 select-none">
+                <Lock size={10} />
+                Supplier — Subscribe to View
+              </span>
+            )
+          }
           <p className="text-xs text-gray-500 mt-0.5">{vendor.vendor_type}</p>
         </div>
         <span className={`text-sm font-bold ${fitColor}`}>{(vendor.fit_score * 100).toFixed(0)}%</span>

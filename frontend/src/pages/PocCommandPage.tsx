@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Users, Phone, Shield, Building2 } from 'lucide-react';
 import MetricCard from '../components/cards/MetricCard';
 import PocCard from '../components/cards/PocCard';
+import SubscriptionBanner from '../components/SubscriptionBanner';
 import { useApi } from '../hooks/useApi';
+import { useSubscription } from '../hooks/useSubscription';
 import { api } from '../services/api';
 
 const CONTACT_TYPES = [
@@ -19,6 +21,7 @@ const CONTACT_TYPES = [
 export default function PocCommandPage() {
   const [contactType, setContactType] = useState('');
   const [stateFilter, setStateFilter] = useState('');
+  const { subscribed } = useSubscription();
 
   const { data: pocs, loading } = useApi(
     () => api.pocs.getAll(contactType || undefined, stateFilter || undefined),
@@ -62,6 +65,8 @@ export default function PocCommandPage() {
         </div>
       </div>
 
+      {!subscribed && <SubscriptionBanner />}
+
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
@@ -77,7 +82,7 @@ export default function PocCommandPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {pocsList.map((poc: any) => (
-              <PocCard key={poc.id} poc={poc} />
+              <PocCard key={poc.id} poc={poc} subscribed={subscribed} />
             ))}
           </div>
 
